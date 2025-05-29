@@ -1,6 +1,7 @@
 import cors from "cors"
 import express from "express"
 import data from "./data.json"
+import listEndpoints from "express-list-endpoints"
 
 // Defines the port the app will run on. Defaults to 8080, but can be overridden
 // when starting the server. Example command to overwrite PORT env variable value:
@@ -14,7 +15,11 @@ app.use(express.json())
 
 // Start defining your routes here
 app.get("/", (req, res) => {
-  res.send("Hello Technigo!")
+  const endpoints = listEndpoints(app)
+  res.json({
+    message: "Welcome to the Happy Thoughts API",
+    endpoints: endpoints
+  })
 })
 
 // Endpoint for getting all posts
