@@ -19,7 +19,16 @@ app.get("/", (req, res) => {
 
 // Endpoint for getting all posts
 app.get("/posts", (req, res) => {
-  res.json(data)
+  
+  const { hearts } = req.query;
+  
+  let filteredData = data;
+
+  if (hearts) {
+    filteredData = filteredData.filter(post => post.hearts === +hearts);
+  }
+
+  res.json(filteredData)
 })
 
 // Endpoint for getting a specific post 
