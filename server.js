@@ -48,17 +48,39 @@ if (process.env.RESET_DB) {
 }
 
 // Endpoint for getting all posts
-app.get("/posts", (req, res) => {
-  
+app.get("/posts", async (req, res) => {
   const { hearts } = req.query;
-  
-  let filteredData = data;
+
+  const query = {}
 
   if (hearts) {
-    filteredData = filteredData.filter(post => post.hearts === +hearts);
+    query.hearts = hearts
   }
 
-  res.json(filteredData)
+  try {
+    const filteredPosts = await Post.find(query)
+
+    if (filteredPosts.length === 0) {
+      return res.status(404).json({
+        success: false,
+        response: [],
+        message: "No posts found for given query. Please try again with a different query"
+      })
+    }
+    res.status(200).json({
+      success: true,
+      response: filteredPosts,
+      message: "Success"
+    })
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      response: error,
+      message: "Failed to fetch posts"
+    })
+  }
+
 })
 
 // Endpoint for getting a specific post 
