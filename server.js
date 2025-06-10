@@ -4,21 +4,17 @@ import data from "./data.json"
 import listEndpoints from "express-list-endpoints"
 import mongoose from "mongoose"
 
-// Defines the port the app will run on. Defaults to 8080, but can be overridden
-// when starting the server. Example command to overwrite PORT env variable value:
-// PORT=9000 npm start
+// Set up mongoose
+const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/happy-thoughts-api"
+mongoose.connect(mongoUrl)
+
+// Set up express
 const port = process.env.PORT || 8080
 const app = express()
 
 // Add middlewares to enable cors and json body parsing
 app.use(cors())
 app.use(express.json())
-
-const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/posts"
-mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
-mongoose.Promise = Promise
-
-const Post = 
 
 // Start defining your routes here
 app.get("/", (req, res) => {
@@ -28,6 +24,28 @@ app.get("/", (req, res) => {
     endpoints: endpoints
   })
 })
+
+// Define post schema
+const postSchema = new mongoose.Schema({
+  id: Number,
+  message: String,
+  hearts: Number,
+  createdAt: String,
+  __v: Number
+})
+
+const Post = mongoose.model("Post", postSchema)
+
+// Seed database
+if (process.env.RESET_DB) {
+  const seedDatabase = async () => {
+    await Post.deleteMany({})
+    data.forEach(post => {
+      new Post(post).save()
+    })
+  }
+  seedDatabase()
+}
 
 // Endpoint for getting all posts
 app.get("/posts", (req, res) => {
