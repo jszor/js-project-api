@@ -95,8 +95,17 @@ app.post("/posts", async (req, res) => {
 
   try {
     const newPost = await new Post({ message }).save()
+    res.status(201).json({
+      success: true,
+      response: newPost,
+      message: "Post created successfully"
+    })
   } catch (error) {
-
+    res.status(500).json({
+      success: false,
+      response: error,
+      message: "Could not create post"
+    })
   }
 })
 
