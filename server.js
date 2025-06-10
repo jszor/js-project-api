@@ -89,6 +89,17 @@ app.get("/posts/:id", (req, res) => {
   res.json(post);
 })
 
+// Endpoint for posting
+app.post("/posts", async (req, res) => {
+  const { message } = req.body
+
+  try {
+    const newPost = await new Post({ message }).save()
+  } catch (error) {
+
+  }
+})
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`)
