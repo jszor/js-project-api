@@ -30,17 +30,6 @@ app.get("/", (req, res) => {
   })
 })
 
-// Define thought schema
-const thoughtSchema = new mongoose.Schema({
-  message: { type: String, required: true },
-  hearts: { type: Number, default: 0 },
-}, 
-{ 
-  timestamps: { createdAt: true, updatedAt: false }
-})
-
-const Thought = mongoose.model("Thought", thoughtSchema)
-
 // Seed database
 if (process.env.RESET_DB) {
   const seedDatabase = async () => {
