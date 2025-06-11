@@ -31,9 +31,9 @@ app.get("/", (req, res) => {
 
 // Define post schema
 const postSchema = new mongoose.Schema({
-  id: Number,
   message: { type: String, required: true },
   hearts: { type: Number, default: 0 },
+  timestamps: { createdAt: true, updatedAt: false }
 })
 
 const Post = mongoose.model("Post", postSchema)
