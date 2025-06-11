@@ -4,6 +4,7 @@ import listEndpoints from "express-list-endpoints"
 import mongoose from "mongoose"
 import dotenv from "dotenv"
 import data from "./data.json"
+import { Thought } from "./models/thought.js"
 
 // Set up dotenv
 dotenv.config()
