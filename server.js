@@ -1,16 +1,16 @@
 import cors from "cors"
 import express from "express"
-import dotenv from "dotenv"
-import data from "./data.json"
 import listEndpoints from "express-list-endpoints"
 import mongoose from "mongoose"
+import dotenv from "dotenv"
+import data from "./data.json"
+
+// Set up dotenv
+dotenv.config()
 
 // Set up mongoose
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/happy-thoughts-api"
 mongoose.connect(mongoUrl)
-
-// Set up dotenv
-dotenv.config()
 
 // Set up express
 const port = process.env.PORT || 8080
@@ -29,8 +29,8 @@ app.get("/", (req, res) => {
   })
 })
 
-// Define post schema
-const postSchema = new mongoose.Schema({
+// Define thought schema
+const thoughtSchema = new mongoose.Schema({
   message: { type: String, required: true },
   hearts: { type: Number, default: 0 },
 }, 
@@ -38,21 +38,21 @@ const postSchema = new mongoose.Schema({
   timestamps: { createdAt: true, updatedAt: false }
 })
 
-const Post = mongoose.model("Post", postSchema)
+const Thought = mongoose.model("Thought", thoughtSchema)
 
 // Seed database
 if (process.env.RESET_DB) {
   const seedDatabase = async () => {
-    await Post.deleteMany({})
-    data.forEach(({ message, hearts}) => {
-      new Post({ message, hearts }).save()
+    await Thought.deleteMany({})
+    data.forEach(({ message, hearts }) => {
+      new Thought({ message, hearts }).save()
     })
   }
   seedDatabase()
 }
 
-// Endpoint for getting all posts
-app.get("/posts", async (req, res) => {
+// Endpoint for getting all thoughts
+app.get("/thoughts", async (req, res) => {
   const { hearts } = req.query;
 
   const query = {}
@@ -62,18 +62,18 @@ app.get("/posts", async (req, res) => {
   }
 
   try {
-    const filteredPosts = await Post.find(query)
+    const filteredThoughts = await Thought.find(query)
 
-    if (filteredPosts.length === 0) {
+    if (filteredThoughts.length === 0) {
       return res.status(404).json({
         success: false,
         response: [],
-        message: "No posts found for given query. Please try again with a different query"
+        message: "No thoughts found for given query. Please try again with a different query"
       })
     }
     res.status(200).json({
       success: true,
-      response: filteredPosts,
+      response: filteredThoughts,
       message: "Success"
     })
 
@@ -81,34 +81,34 @@ app.get("/posts", async (req, res) => {
     res.status(500).json({
       success: false,
       response: error,
-      message: "Failed to fetch posts"
+      message: "Failed to fetch thoughts"
     })
   }
 
 })
 
-// Endpoint for getting a specific post 
-app.get("/posts/:id", (req, res) => {
-  const post = data.find((post) => post.id === req.params.id);
-  res.json(post);
+// Endpoint for getting a specific thought 
+app.get("/thoughts/:id", (req, res) => {
+  const thought = data.find((thought) => thought.id === req.params.id);
+  res.json(thought);
 })
 
 // Endpoint for posting
-app.post("/posts", async (req, res) => {
+app.post("/thoughts", async (req, res) => {
   const { message } = req.body
 
   try {
-    const newPost = await new Post({ message }).save()
+    const newThought = await new Thought({ message }).save()
     res.status(201).json({
       success: true,
-      response: newPost,
-      message: "Post created successfully"
+      response: newThought,
+      message: "Thought created successfully"
     })
   } catch (error) {
     res.status(500).json({
       success: false,
       response: error,
-      message: "Could not create post"
+      message: "Could not create thought"
     })
   }
 })
