@@ -33,6 +33,8 @@ app.get("/", (req, res) => {
 const postSchema = new mongoose.Schema({
   message: { type: String, required: true },
   hearts: { type: Number, default: 0 },
+}, 
+{ 
   timestamps: { createdAt: true, updatedAt: false }
 })
 
@@ -42,8 +44,8 @@ const Post = mongoose.model("Post", postSchema)
 if (process.env.RESET_DB) {
   const seedDatabase = async () => {
     await Post.deleteMany({})
-    data.forEach(post => {
-      new Post(post).save()
+    data.forEach(({ message, hearts}) => {
+      new Post({ message, hearts }).save()
     })
   }
   seedDatabase()
