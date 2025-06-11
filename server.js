@@ -1,5 +1,6 @@
 import cors from "cors"
 import express from "express"
+import dotenv from "dotenv"
 import data from "./data.json"
 import listEndpoints from "express-list-endpoints"
 import mongoose from "mongoose"
@@ -7,6 +8,9 @@ import mongoose from "mongoose"
 // Set up mongoose
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/happy-thoughts-api"
 mongoose.connect(mongoUrl)
+
+// Set up dotenv
+dotenv.config()
 
 // Set up express
 const port = process.env.PORT || 8080
@@ -28,10 +32,8 @@ app.get("/", (req, res) => {
 // Define post schema
 const postSchema = new mongoose.Schema({
   id: Number,
-  message: String,
-  hearts: Number,
-  createdAt: String,
-  __v: Number
+  message: { type: String, required: true },
+  hearts: { type: Number, default: 0 },
 })
 
 const Post = mongoose.model("Post", postSchema)
