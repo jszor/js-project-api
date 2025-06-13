@@ -5,6 +5,7 @@ import mongoose from "mongoose"
 import dotenv from "dotenv"
 import data from "./data.json"
 import { Thought } from "./models/thought.js"
+import { User } from "./models/user.js"
 
 // Set up dotenv
 dotenv.config()
@@ -21,15 +22,6 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-// Start defining your routes here
-app.get("/", (req, res) => {
-  const endpoints = listEndpoints(app)
-  res.json({
-    message: "Welcome to the Happy Thoughts API",
-    endpoints: endpoints
-  })
-})
-
 // Seed database
 if (process.env.RESET_DB) {
   const seedDatabase = async () => {
@@ -40,6 +32,15 @@ if (process.env.RESET_DB) {
   }
   seedDatabase()
 }
+
+// Start defining your routes here
+app.get("/", (req, res) => {
+  const endpoints = listEndpoints(app)
+  res.json({
+    message: "Welcome to the Happy Thoughts API",
+    endpoints: endpoints
+  })
+})
 
 // Endpoint for getting all thoughts
 app.get("/thoughts", async (req, res) => {
@@ -77,13 +78,13 @@ app.get("/thoughts", async (req, res) => {
 
 })
 
-// Endpoint for getting a specific thought 
+// Endpoint for getting a specific thought by id
 app.get("/thoughts/:id", (req, res) => {
   const thought = data.find((thought) => thought.id === req.params.id);
   res.json(thought);
 })
 
-// Endpoint for posting
+// Endpoint for posting thoughts
 app.post("/thoughts", async (req, res) => {
   const { message } = req.body
 
