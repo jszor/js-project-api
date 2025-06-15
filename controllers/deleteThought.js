@@ -16,7 +16,7 @@ export const deleteThought = async (req, res) => {
       })
     }
 
-    if (thought.userId.toString() !== userId) {
+    if (thought.userId.toString() !== userId.toString()) {
       return res.status(403).json({
         success: false,
         response: [],
