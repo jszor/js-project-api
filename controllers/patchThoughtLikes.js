@@ -20,7 +20,7 @@ export const patchThoughtLikes = async (req, res) => {
 
     if (hasLiked) {
       // remove like
-      thought.likes = thought.likes.filter(like => like.toString() !== userId)
+      thought.likes = thought.likes.filter(like => like.toString() !== userId.toString())
     } else {
       // add like
       thought.likes.push(userId)
