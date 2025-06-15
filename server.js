@@ -3,37 +3,42 @@ import express from "express"
 import listEndpoints from "express-list-endpoints"
 import mongoose from "mongoose"
 import dotenv from "dotenv"
-import data from "./data.json"
-import { Thought } from "./models/thought.js"
-import { User } from "./models/user.js"
 
-// Set up dotenv
+import { getThoughts } from "./controllers/getThoughts.js"
+import { getThought } from "./controllers/getThought.js"
+import { postThought } from "./controllers/postThought.js"
+import { patchThought } from "./controllers/patchThought.js"
+import { patchThoughtLikes } from "./controllers/patchThoughtLikes.js"
+import { deleteThought } from "./controllers/deleteThought.js"
+import { postUser } from "./controllers/postUser.js"
+import { loginUser } from "./controllers/loginUser.js"
+import { getUserData } from "./controllers/getUserData.js"
+import { authenticateUser } from "./middleware/authenticateUser.js"
+
 dotenv.config()
 
-// Set up mongoose
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/happy-thoughts-api"
 mongoose.connect(mongoUrl)
 
-// Set up express
 const port = process.env.PORT || 8080
 const app = express()
 
-// Add middlewares to enable cors and json body parsing
 app.use(cors())
 app.use(express.json())
 
 // Seed database
-if (process.env.RESET_DB) {
-  const seedDatabase = async () => {
-    await Thought.deleteMany({})
-    data.forEach(({ message, hearts }) => {
-      new Thought({ message, hearts }).save()
-    })
-  }
-  seedDatabase()
-}
+// if (process.env.RESET_DB) {
+//   const seedDatabase = async () => {
+//     await Thought.deleteMany({})
+//     data.forEach(({ message, hearts }) => {
+//       new Thought({ message, hearts }).save()
+//     })
+//   }
+//   seedDatabase()
+// }
 
-// Start defining your routes here
+// List all API endpoints for documentation
+
 app.get("/", (req, res) => {
   const endpoints = listEndpoints(app)
   res.json({
@@ -42,67 +47,34 @@ app.get("/", (req, res) => {
   })
 })
 
+// Set up endpoints 
+
 // Endpoint for getting all thoughts
-app.get("/thoughts", async (req, res) => {
-  const { hearts } = req.query;
-
-  const query = {}
-
-  if (hearts) {
-    query.hearts = hearts
-  }
-
-  try {
-    const filteredThoughts = await Thought.find(query)
-
-    if (filteredThoughts.length === 0) {
-      return res.status(404).json({
-        success: false,
-        response: [],
-        message: "No thoughts found for given query. Please try again with a different query"
-      })
-    }
-    res.status(200).json({
-      success: true,
-      response: filteredThoughts,
-      message: "Success"
-    })
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      response: error,
-      message: "Failed to fetch thoughts"
-    })
-  }
-
-})
+app.get("/thoughts", authenticateUser, getThoughts)
 
 // Endpoint for getting a specific thought by id
-app.get("/thoughts/:id", (req, res) => {
-  const thought = data.find((thought) => thought.id === req.params.id);
-  res.json(thought);
-})
+app.get("/thoughts/:id", authenticateUser, getThought)
 
-// Endpoint for posting thoughts
-app.post("/thoughts", async (req, res) => {
-  const { message } = req.body
+// Endpoint for posting a thought
+app.post("/thoughts", authenticateUser, postThought)
 
-  try {
-    const newThought = await new Thought({ message }).save()
-    res.status(201).json({
-      success: true,
-      response: newThought,
-      message: "Thought created successfully"
-    })
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      response: error,
-      message: "Could not create thought"
-    })
-  }
-})
+// Endpoint for updating a thought
+app.patch("/thoughts/:id", authenticateUser, patchThought)
+
+// Endpoint for toggling likes
+app.patch("/thoughts/:id/likes", authenticateUser, patchThoughtLikes)
+
+// Endpoint for deleting a thought
+app.delete("/thoughts/:id", authenticateUser, deleteThought)
+
+// Endpoint for registering a user
+app.post("/users/register", postUser)
+
+// Endpoint for logging in a user
+app.post("/users/login", loginUser)
+
+// Endpoint for retrieving the data of an authenticated user
+app.get("/users/me", authenticateUser, getUserData)
 
 // Start the server
 app.listen(port, () => {

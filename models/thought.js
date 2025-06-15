@@ -7,10 +7,16 @@ const thoughtSchema = new mongoose.Schema({
     minLength: 5,
     maxLength: 140
   },
-  hearts: { 
-    type: Number, 
-    default: 0,
-    min: 0
+  likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }
+  ],
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
   },
   createdAt: {
     type: Date,
