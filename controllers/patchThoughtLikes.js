@@ -2,7 +2,7 @@ import { Thought } from "../models/thought.js"
 
 export const patchThoughtLikes = async (req, res) => {
   const { id } = req.params
-  const { userId } = req.body
+  const userId = req.user._id
 
   try {
 
