@@ -26,17 +26,6 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-// Seed database
-// if (process.env.RESET_DB) {
-//   const seedDatabase = async () => {
-//     await Thought.deleteMany({})
-//     data.forEach(({ message, hearts }) => {
-//       new Thought({ message, hearts }).save()
-//     })
-//   }
-//   seedDatabase()
-// }
-
 // List all API endpoints for documentation
 
 app.get("/", (req, res) => {
